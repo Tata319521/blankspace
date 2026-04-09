@@ -1,0 +1,60 @@
+[
+  {
+    "id": 1,
+    "title": "雾海回廊",
+    "type": "探索型副本",
+    "difficulty": "中等",
+    "tags": ["剧情", "星空", "解谜"],
+    "description": "不错",
+    "reviews": [
+      {
+        "user": "黎隐",
+        "role": "玩家",
+        "score": 4.5,
+        "content": "孩子很爱吃",
+        "time": "2026-03-31 10:00"
+      },
+      {
+        "user": "黎隐",
+        "role": "玩家",
+        "score": 4.0,
+        "content": "世界观设计很完整，就是前半段提示可以再明显一点。",
+        "time": "2026-03-31 10:25"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "title": "灰羽钟塔",
+    "type": "Boss型副本",
+    "difficulty": "困难",
+    "tags": ["机制", "战斗", "coc"],
+    "description": "不知道写啥",
+    "reviews": [
+      {
+        "user": "黎隐",
+        "role": "玩家",
+        "score": 4.8,
+        "content": "Boss 战很好玩，机制很紧凑，打起来非常有压迫感。",
+        "time": "2026-03-31 09:40"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "title": "无星荒庭",
+    "type": "团队型副本",
+    "difficulty": "高",
+    "tags": ["团本", "生存", "coc"],
+    "description": "词穷",
+    "reviews": [
+      {
+        "user": "黎隐",
+        "role": "boss",
+        "score": 4.2,
+        "content": "123",
+        "time": "2026-03-31 08:50"
+      }
+    ]
+  }
+]

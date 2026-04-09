@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>空白地 - 登录</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="login-body">
+  <canvas id="particle-canvas"></canvas>
+
+  <img src="./css/img/bird.svg" class="bird bird-1" alt="bird" />
+  <img src="./css/img/bird.svg" class="bird bird-2" alt="bird" />
+  <img src="./css/img/bird.svg" class="bird bird-3" alt="bird" />
+
+  <main class="login-wrapper">
+    <section class="brand-block fade-up">
+      <p class="brand-subtitle">BLANK_SPACE_TATA</p>
+      <h1 class="brand-title">空白地</h1>
+      <p class="brand-desc">
+        这里欢迎你的到来<br />
+      </p>
+    </section>
+
+    <section class="login-card fade-up delay-2">
+      <div class="card-glow"></div>
+      <h2>登录</h2>
+      <p class="tip">默认账号：admin　默认密码：123456</p>
+
+      <div class="form-group">
+        <label for="username">用户名</label>
+        <input id="username" type="text" value="admin" />
+      </div>
+
+      <div class="form-group">
+        <label for="password">密码</label>
+        <input id="password" type="password" value="123456" />
+      </div>
+
+      <div class="form-group">
+        <label for="role">登录分类</label>
+        <select id="role">
+          <option value="">请选择身份</option>
+          <option value="npc">npc</option>
+          <option value="玩家">玩家</option>
+          <option value="boss">boss</option>
+        </select>
+      </div>
+
+      <button id="loginBtn" class="main-btn">点击登录</button>
+      <p id="loginMsg" class="msg"></p>
+    </section>
+  </main>
+
+  <script src="./js/particles-config.js"></script>
+  <script src="./js/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>空白地 - 论坛</title>
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body class="forum-body">
+  <canvas id="particle-canvas"></canvas>
+
+  <img src="./css/img/bird.svg" class="bird bird-1" alt="bird" />
+  <img src="./css/img/bird.svg" class="bird bird-2" alt="bird" />
+
+  <header class="forum-header">
+    <div class="logo-area">
+      <h1>空白地</h1>
+      <p>WELCOME</p>
+    </div>
+
+    <div class="user-area">
+      <span id="welcomeText">欢迎</span>
+      <button id="diceBtn" class="sub-btn">骰子</button>
+      <button id="logoutBtn" class="sub-btn">退出登录</button>
+    </div>
+  </header>
+
+  <main class="forum-layout">
+    <aside class="sidebar glass-card">
+      <div class="sidebar-title">副本列表</div>
+      <div id="dungeonList" class="dungeon-list"></div>
+    </aside>
+
+    <section class="content-area">
+      <div id="dungeonDetail" class="glass-card dungeon-detail">
+        <p>正在加载副本信息...</p>
+      </div>
+
+      <div class="glass-card rating-card">
+        <h3>发表评价</h3>
+        <div class="review-form">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="reviewUser">昵称</label>
+              <input id="reviewUser" type="text" placeholder="请输入昵称" />
+            </div>
+            <div class="form-group">
+              <label for="reviewScore">评分（0-5）</label>
+              <input id="reviewScore" type="number" min="0" max="5" step="0.5" value="4.5" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="reviewContent">评价内容</label>
+            <textarea id="reviewContent" rows="4" placeholder="那么你想说...?"></textarea>
+          </div>
+
+          <button id="submitReviewBtn" class="main-btn">发表评价</button>
+          <p id="reviewMsg" class="msg"></p>
+        </div>
+      </div>
+
+      <div class="glass-card review-list-card">
+        <h3>评价列表</h3>
+        <div id="reviewList" class="review-list"></div>
+      </div>
+    </section>
+  </main>
+
+  <script src="./js/particles-config.js"></script>
+  <script src="./js/forum.js"></script>
+</body>
+</html>

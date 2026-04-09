@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>空白地 - 骰子游戏</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <style>
+    /* 骰子游戏专属样式 */
+    .dice-layout {
+      position: relative;
+      z-index: 2;
+      max-width: 1320px;
+      margin: 0 auto;
+      padding: 20px 24px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .dice-card {
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .dice-setting {
+      width: 100%;
+      max-width: 600px;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .dice-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .dice-title {
+      font-size: 24px;
+      font-weight: 500;
+      text-align: center;
+      margin: 0;
+    }
+
+    .dice-container {
+      perspective: 800px;
+      width: 120px;
+      height: 120px;
+      position: relative;
+    }
+
+    .dice {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    .dice.rolling {
+      animation: rollDice 1.5s ease-out;
+    }
+
+    .dice-face {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 2px solid rgba(255, 255, 255, 0.15);
+      border-radius: 18px;
+      background: rgba(0, 0, 0, 0.25);
+      backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* 骰子6个面的3D定位 */
+    .face-1 { transform: rotateX(0deg) rotateY(0deg) translateZ(60px); }
+    .face-2 { transform: rotateX(0deg) rotateY(90deg) translateZ(60px); }
+    .face-3 { transform: rotateX(90deg) rotateY(0deg) translateZ(60px); }
+    .face-4 { transform: rotateX(-90deg) rotateY(0deg) translateZ(60px); }
+    .face-5 { transform: rotateX(0deg) rotateY(-90deg) translateZ(60px); }
+    .face-6 { transform: rotateX(180deg) rotateY(0deg) translateZ(60px); }
+
+    @keyframes rollDice {
+      0% { transform: rotateX(0deg) rotateY(0deg); }
+      100% { transform: rotateX(1800deg) rotateY(1440deg); }
+    }
+
+    .result-text {
+      font-size: 48px;
+      font-weight: 700;
+      opacity: 0;
+      transform: translateY(20px) scale(0.8);
+      transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 10;
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    }
+
+    .result-text.success {
+      color: #4ade80;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .result-text.fail {
+      color: #f87171;
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .dice-actions {
+      display: flex;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .current-score {
+      font-size: 20px;
+      color: var(--text-soft);
+      margin: 10px 0;
+    }
+
+    /* 适配移动端 */
+    @media (max-width: 640px) {
+      .dice-container {
+        width: 100px;
+        height: 100px;
+      }
+      .face-1, .face-2, .face-3, .face-4, .face-5, .face-6 {
+        transform: translateZ(50px);
+      }
+      .result-text {
+        font-size: 36px;
+      }
+    }
+  </style>
+</head>
+<body class="forum-body">
+  <canvas id="particle-canvas"></canvas>
+
+  <img src="./css/img/bird.svg" class="bird bird-1" alt="bird" />
+  <img src="./css/img/bird.svg" class="bird bird-2" alt="bird" />
+
+  <header class="forum-header">
+    <div class="logo-area">
+      <h1>空白地</h1>
+      <p>DICE GAME</p>
+    </div>
+
+    <div class="user-area">
+      <span id="welcomeText">欢迎</span>
+      <button id="backBtn" class="sub-btn">返回论坛</button>
+      <button id="logoutBtn" class="sub-btn">退出登录</button>
+    </div>
+  </header>
+
+  <main class="dice-layout">
+    <div class="glass-card dice-card">
+      <h3 class="dice-title">骰子</h3>
+      
+      <div class="dice-setting">
+        <div class="dice-group">
+          <label for="totalPoints">骰子总点数范围 (1-6)</label>
+          <input id="totalPoints" type="number" min="1" max="6" value="6" />
+        </div>
+        <div class="dice-group">
+          <label for="winPoints">大于该点数算胜利 (0-5)</label>
+          <input id="winPoints" type="number" min="0" max="5" value="3" />
+        </div>
+      </div>
+
+      <div class="current-score" id="currentScore">当前点数：-</div>
+
+      <div style="position: relative;">
+        <div class="dice-container">
+          <div class="dice" id="dice">
+            <div class="dice-face face-1">1</div>
+            <div class="dice-face face-2">2</div>
+            <div class="dice-face face-3">3</div>
+            <div class="dice-face face-4">4</div>
+            <div class="dice-face face-5">5</div>
+            <div class="dice-face face-6">6</div>
+          </div>
+        </div>
+        <div class="result-text" id="resultText"></div>
+      </div>
+
+      <div class="dice-actions">
+        <button id="rollBtn" class="main-btn">ROLL</button>
+        <button id="resetBtn" class="sub-btn">RESET</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="./js/particles-config.js"></script>
+  <script>
+    // 验证用户登录状态
+    document.addEventListener("DOMContentLoaded", async () => {
+      const userRaw = sessionStorage.getItem("blank_space_user");
+      if (!userRaw) {
+        window.location.href = "./index.html";
+        return;
+      }
+      const user = JSON.parse(userRaw);
+      document.getElementById("welcomeText").textContent = `欢迎你，${user.username}（${user.role}）`;
+
+      // 按钮事件绑定
+      const backBtn = document.getElementById("backBtn");
+      const logoutBtn = document.getElementById("logoutBtn");
+      const rollBtn = document.getElementById("rollBtn");
+      const resetBtn = document.getElementById("resetBtn");
+      const dice = document.getElementById("dice");
+      const resultText = document.getElementById("resultText");
+      const currentScore = document.getElementById("currentScore");
+      const totalPointsInput = document.getElementById("totalPoints");
+      const winPointsInput = document.getElementById("winPoints");
+
+      // 返回论坛
+      backBtn.addEventListener("click", () => {
+        window.location.href = "./forum.html";
+      });
+
+      // 退出登录
+      logoutBtn.addEventListener("click", () => {
+        sessionStorage.removeItem("blank_space_user");
+        window.location.href = "./index.html";
+      });
+
+      // 重置游戏
+      resetBtn.addEventListener("click", () => {
+        dice.classList.remove("rolling");
+        resultText.className = "result-text";
+        resultText.textContent = "";
+        currentScore.textContent = "当前点数：-";
+        dice.style.transform = "rotateX(0deg) rotateY(0deg)";
+      });
+
+      // 掷骰子逻辑
+      rollBtn.addEventListener("click", () => {
+        // 验证输入
+        const totalPoints = parseInt(totalPointsInput.value);
+        const winPoints = parseInt(winPointsInput.value);
+        if (isNaN(totalPoints) || totalPoints < 1 || totalPoints > 6) {
+          alert("请输入1-6之间的总点数");
+          return;
+        }
+        if (isNaN(winPoints) || winPoints < 0 || winPoints > 5) {
+          alert("请输入0-5之间的胜利点数");
+          return;
+        }
+
+        // 重置结果
+        dice.classList.add("rolling");
+        resultText.className = "result-text";
+        resultText.textContent = "";
+        
+        // 随机生成点数
+        setTimeout(() => {
+          const randomPoint = Math.floor(Math.random() * totalPoints) + 1;
+          // 设置骰子最终显示的面
+          setDiceFace(randomPoint);
+          dice.classList.remove("rolling");
+          currentScore.textContent = `当前点数：${randomPoint}`;
+
+          // 判断胜负并显示特效
+          if (randomPoint > winPoints) {
+            resultText.textContent = "SUCCESS";
+            resultText.className = "result-text success";
+          } else {
+            resultText.textContent = "FAIL";
+            resultText.className = "result-text fail";
+          }
+        }, 1500);
+      });
+
+      // 设置骰子显示的面
+      function setDiceFace(point) {
+        const dice = document.getElementById("dice");
+        switch(point) {
+          case 1:
+            dice.style.transform = "rotateX(0deg) rotateY(0deg)";
+            break;
+          case 2:
+            dice.style.transform = "rotateX(0deg) rotateY(-90deg)";
+            break;
+          case 3:
+            dice.style.transform = "rotateX(-90deg) rotateY(0deg)";
+            break;
+          case 4:
+            dice.style.transform = "rotateX(90deg) rotateY(0deg)";
+            break;
+          case 5:
+            dice.style.transform = "rotateX(0deg) rotateY(90deg)";
+            break;
+          case 6:
+            dice.style.transform = "rotateX(180deg) rotateY(0deg)";
+            break;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

@@ -5,78 +5,120 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>骰子</title>
     <style>
+        /* ==================== 复用原index.html的CSS变量 ==================== */
         :root {
-            --bg-main: #1a1a2e;
-            --bg-secondary: #16213e;
-            --text-main: #eaeaea;
-            --accent: #0f3460;
-            --success: #4ecca3;
-            --fail: #ff6b6b;
+            --bg-1: #050608;
+            --bg-2: #0d1016;
+            --bg-3: #151922;
+            --text-main: #f3f4f6;
+            --text-soft: rgba(255, 255, 255, 0.72);
+            --text-faint: rgba(255, 255, 255, 0.48);
+            --line: rgba(255, 255, 255, 0.08);
+            --card: rgba(255, 255, 255, 0.06);
+            --card-strong: rgba(255, 255, 255, 0.09);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+            --radius-xl: 28px;
+            --radius-lg: 20px;
+            --radius-md: 14px;
+            --accent: #d1d5db;
         }
 
         * {
-            margin: 0;
-            padding: 0;
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--bg-main) 0%, var(--bg-secondary) 100%);
+        html, body {
+            margin: 0;
+            padding: 0;
+            min-height: 100%;
+            font-family: "PingFang SC", "Microsoft YaHei", "Helvetica Neue", Arial, sans-serif;
+            /* 复用login-body的背景渐变 */
+            background:
+                radial-gradient(circle at 20% 10%, rgba(255,255,255,0.08), transparent 18%),
+                radial-gradient(circle at 85% 18%, rgba(255,255,255,0.05), transparent 12%),
+                linear-gradient(180deg, #14181f 0%, #0c0e12 42%, #040506 100%);
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+
+        /* ==================== 骰子专属样式（适配原风格） ==================== */
+        .game-wrapper {
+            position: relative;
+            z-index: 2;
             min-height: 100vh;
+            padding: 40px 24px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            color: var(--text-main);
-            padding: 20px;
+            max-width: 480px;
+            margin: 0 auto;
         }
 
-        .game-container {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 24px;
-            padding: 40px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            max-width: 400px;
+        /* 骰子卡片容器 - 复用login-card的毛玻璃效果 */
+        .dice-card {
+            position: relative;
+            z-index: 2;
+            background: var(--card);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow);
+            padding: 32px 28px;
             width: 100%;
+            text-align: center;
         }
 
-        h1 {
-            margin-bottom: 30px;
+        .card-glow {
+            position: absolute;
+            inset: -1px;
+            border-radius: var(--radius-xl);
+            background: linear-gradient(135deg, rgba(255,255,255,0.08), transparent 30%, transparent 70%, rgba(255,255,255,0.05));
+            pointer-events: none;
+        }
+
+        .dice-card h2 {
+            margin-top: 0;
             font-size: 28px;
-            font-weight: 700;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+
+        .tip {
+            color: var(--text-faint);
+            margin-bottom: 24px;
+            font-size: 14px;
         }
 
         .input-group {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 18px;
             text-align: left;
         }
 
         .input-group label {
-            display: block;
-            margin-bottom: 8px;
             font-size: 14px;
-            opacity: 0.8;
+            color: var(--text-soft);
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px 16px;
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.2);
-            color: var(--text-main);
-            font-size: 16px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.28);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 14px;
             outline: none;
-            transition: border-color 0.3s;
+            font-size: 14px;
+            transition: 0.25s ease;
         }
 
         .input-group input:focus {
-            border-color: var(--accent);
+            border-color: rgba(255,255,255,0.22);
+            box-shadow: 0 0 0 4px rgba(255,255,255,0.04);
         }
 
         .dice-wrapper {
@@ -87,7 +129,7 @@
             min-height: 160px;
         }
 
-        /* 3D容器核心修复 */
+        /* 3D骰子容器 - 修复移动端渲染 */
         .dice-container {
             perspective: 800px;
             -webkit-perspective: 800px;
@@ -113,21 +155,20 @@
             animation: rollDice 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
         }
 
-        /* 骰子面样式修复：隔离backdrop-filter */
+        /* 骰子面 - 适配原风格的低透+毛玻璃（隔离模糊层） */
         .dice-face {
             position: absolute;
             width: 100%;
             height: 100%;
-            border: 2px solid rgba(255, 255, 255, 0.15);
-            border-radius: 18px;
-            background: rgba(0, 0, 0, 0.25);
+            border: 1px solid var(--line); /* 复用原边框变量 */
+            border-radius: var(--radius-lg); /* 复用原圆角变量 */
+            background: rgba(0, 0, 0, 0.28); /* 匹配原input背景 */
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 32px;
             font-weight: 700;
-            color: var(--text-main);
-            /* 显式开启硬件加速 */
+            color: var(--text-main); /* 复用原文字主色 */
             transform: translateZ(0);
             -webkit-transform: translateZ(0);
             backface-visibility: visible;
@@ -142,7 +183,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            border-radius: 16px;
+            border-radius: var(--radius-lg);
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             z-index: -1;
@@ -165,32 +206,30 @@
             100% { transform: rotateX(1800deg) rotateY(1440deg) rotateZ(720deg); }
         }
 
-        .roll-btn {
-            background: linear-gradient(135deg, var(--accent) 0%, #1a4a7a 100%);
+        /* 按钮 - 复用原main-btn风格 */
+        .main-btn {
+            width: 100%;
+            padding: 14px 18px;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #f3f4f6 0%, #d1d5db 100%);
+            color: #111827;
+            font-size: 15px;
+            font-weight: 700;
+            margin-top: 4px;
             border: none;
-            color: var(--text-main);
-            padding: 14px 40px;
-            border-radius: 12px;
-            font-size: 18px;
-            font-weight: 600;
             cursor: pointer;
-            transition: transform 0.2s, box-shadow 0.2s;
-            box-shadow: 0 4px 15px rgba(15, 52, 96, 0.4);
+            transition: 0.25s ease;
         }
 
-        .roll-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(15, 52, 96, 0.6);
-        }
-
-        .roll-btn:active {
-            transform: translateY(0);
+        .main-btn:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.03);
         }
 
         .current-score {
             margin-top: 20px;
             font-size: 18px;
-            opacity: 0.8;
+            color: var(--text-soft);
         }
 
         .result-text {
@@ -203,24 +242,25 @@
         }
 
         .result-text.success {
-            color: var(--success);
+            color: var(--accent); /* 复用原accent色 */
             opacity: 1;
             transform: scale(1);
         }
 
         .result-text.fail {
-            color: var(--fail);
+            color: #ff6b6b;
             opacity: 1;
             transform: scale(1);
         }
 
-        /* 移动端适配优化 */
+        /* 移动端适配 - 复用原响应式逻辑 */
         @media (max-width: 640px) {
-            .game-container {
-                padding: 30px 20px;
+            .dice-card {
+                border-radius: 22px;
+                padding: 28px 20px;
             }
 
-            h1 {
+            .dice-card h2 {
                 font-size: 24px;
             }
 
@@ -245,35 +285,39 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <h1>🎲 3D 幸运骰子</h1>
-        
-        <div class="input-group">
-            <label for="totalPoints">总点数（1-6）：</label>
-            <input type="number" id="totalPoints" value="6" min="1" max="6">
-        </div>
-        
-        <div class="input-group">
-            <label for="winPoints">胜利点数（0-5）：</label>
-            <input type="number" id="winPoints" value="3" min="0" max="5">
-        </div>
+    <div class="game-wrapper">
+        <div class="dice-card">
+            <div class="card-glow"></div>
+            <h2>骰子</h2>
+            <p class="tip">GOOD LUCK</p>
+            
+            <div class="input-group">
+                <label for="totalPoints">总点数（1-6）：</label>
+                <input type="number" id="totalPoints" value="6" min="1" max="6">
+            </div>
+            
+            <div class="input-group">
+                <label for="winPoints">胜利点数（0-5）：</label>
+                <input type="number" id="winPoints" value="3" min="0" max="5">
+            </div>
 
-        <div class="dice-wrapper">
-            <div class="dice-container">
-                <div class="dice" id="dice">
-                    <div class="dice-face face-1">1</div>
-                    <div class="dice-face face-2">2</div>
-                    <div class="dice-face face-3">3</div>
-                    <div class="dice-face face-4">4</div>
-                    <div class="dice-face face-5">5</div>
-                    <div class="dice-face face-6">6</div>
+            <div class="dice-wrapper">
+                <div class="dice-container">
+                    <div class="dice" id="dice">
+                        <div class="dice-face face-1">1</div>
+                        <div class="dice-face face-2">2</div>
+                        <div class="dice-face face-3">3</div>
+                        <div class="dice-face face-4">4</div>
+                        <div class="dice-face face-5">5</div>
+                        <div class="dice-face face-6">6</div>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <button class="roll-btn" id="rollBtn">开始投掷</button>
-        <div class="current-score" id="currentScore">当前点数：-</div>
-        <div class="result-text" id="resultText"></div>
+            <button class="main-btn" id="rollBtn">开始投掷</button>
+            <div class="current-score" id="currentScore">当前点数：-</div>
+            <div class="result-text" id="resultText"></div>
+        </div>
     </div>
 
     <script>
